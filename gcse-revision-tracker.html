@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCSE Revision Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: #2a2a35;
+    --text: #e8e8f0;
+    --muted: #6b6b7d;
+    --bio: #4ade80;
+    --bio-dim: #1a3a24;
+    --chem: #f87171;
+    --chem-dim: #3a1a1a;
+    --phys: #60a5fa;
+    --phys-dim: #1a2a3a;
+    --math: #fb923c;
+    --math-dim: #3a2010;
+    --bus: #a78bfa;
+    --bus-dim: #251a3a;
+    --comp: #22d3ee;
+    --comp-dim: #0a2a30;
+    --elit: #f9a8d4;
+    --elit-dim: #3a1a28;
+    --elang: #fde68a;
+    --elang-dim: #3a3010;
+    --geo: #86efac;
+    --geo-dim: #1a3020;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    padding: 40px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  .logo span { color: var(--muted); }
+
+  .global-progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .global-progress-text {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .global-bar-wrap {
+    width: 180px;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .global-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #60a5fa, #f87171);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  /* HOME */
+  #home {
+    padding: 64px 48px;
+  }
+
+  .home-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+
+  .home-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 56px;
+  }
+
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .subject-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .subject-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .subject-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .subject-card:hover::before { opacity: 1; }
+  .subject-card:hover { border-color: var(--accent); }
+
+  .subject-card.coming-soon {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .subject-card.coming-soon:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border);
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+    background: var(--accent-dim);
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+
+  .card-subtitle {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .card-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-bar {
+    flex: 1;
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .card-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .card-pct {
+    font-size: 0.78rem;
+    color: var(--muted);
+    min-width: 35px;
+    text-align: right;
+  }
+
+  .soon-badge {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+
+  /* SUBJECT PAGE */
+  #subject-page {
+    display: none;
+    padding: 0 48px 80px;
+  }
+
+  .subject-page-header {
+    padding: 36px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s;
+    margin-bottom: 20px;
+    background: none;
+    border: none;
+    font-family: inherit;
+  }
+
+  .back-btn:hover { color: var(--text); }
+
+  .subject-page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--s-accent);
+  }
+
+  .subject-page-meta {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 12px;
+  }
+
+  .subject-page-count {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .subject-page-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .subject-page-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .subject-page-bar-fill {
+    height: 100%;
+    background: var(--s-accent);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .subject-page-pct {
+    font-size: 0.85rem;
+    color: var(--s-accent);
+    font-weight: 600;
+    min-width: 40px;
+  }
+
+  .clear-btn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .clear-btn:hover { border-color: var(--muted); color: var(--text); }
+
+  /* CHAPTERS */
+  .chapters-list { display: flex; flex-direction: column; gap: 24px; }
+
+  .chapter-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .chapter-header {
+    display: flex;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .chapter-header:hover { background: #22222a; }
+
+  .chapter-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    flex: 1;
+    color: var(--s-accent);
+  }
+
+  .chapter-count {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .chapter-chevron {
+    color: var(--muted);
+    transition: transform 0.2s;
+    font-size: 0.75rem;
+  }
+
+  .chapter-block.collapsed .chapter-chevron { transform: rotate(-90deg); }
+  .chapter-block.collapsed .topics-list { display: none; }
+
+  .topics-list { padding: 8px 0; }
+
+  .topic-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 24px;
+    cursor: pointer;
+    transition: background 0.12s;
+    border-bottom: 1px solid transparent;
+  }
+
+  .topic-item:hover { background: rgba(255,255,255,0.03); }
+
+  .topic-item:last-child { border-bottom: none; }
+
+  .topic-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    background: transparent;
+  }
+
+  .topic-item.done .topic-check {
+    background: var(--s-accent);
+    border-color: var(--s-accent);
+  }
+
+  .topic-check svg { display: none; }
+  .topic-item.done .topic-check svg { display: block; }
+
+  .topic-label {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text);
+    transition: color 0.15s;
+  }
+
+  .topic-item.done .topic-label {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--muted);
+  }
+
+  .topic-code {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .topic-page {
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chapter-block { animation: fadeIn 0.3s ease both; }
+  .chapter-block:nth-child(1) { animation-delay: 0.05s; }
+  .chapter-block:nth-child(2) { animation-delay: 0.1s; }
+  .chapter-block:nth-child(3) { animation-delay: 0.15s; }
+  .chapter-block:nth-child(4) { animation-delay: 0.2s; }
+  .chapter-block:nth-child(5) { animation-delay: 0.25s; }
+  .chapter-block:nth-child(6) { animation-delay: 0.3s; }
+  .chapter-block:nth-child(7) { animation-delay: 0.35s; }
+  .chapter-block:nth-child(8) { animation-delay: 0.4s; }
+
+  @media (max-width: 700px) {
+    header { padding: 20px 20px; }
+    #home { padding: 40px 20px; }
+    #subject-page { padding: 0 20px 60px; }
+    .home-title { font-size: 2rem; }
+    .global-bar-wrap { width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">GCSE <span>Tracker</span></div>
+  <div class="global-progress">
+    <div class="global-progress-text" id="global-text">0 / 0 topics</div>
+    <div class="global-bar-wrap">
+      <div class="global-bar-fill" id="global-bar" style="width:0%"></div>
+    </div>
+  </div>
+</header>
+
+<div id="home">
+  <div class="home-title">Your Revision<br>Dashboard</div>
+  <div class="home-sub">Click a subject to start ticking off topics.</div>
+  <div class="subjects-grid" id="subjects-grid"></div>
+</div>
+
+<div id="subject-page">
+  <div class="subject-page-header">
+    <button class="back-btn" onclick="goHome()">← Back to subjects</button>
+    <div class="subject-page-title" id="sp-title"></div>
+    <div class="subject-page-meta">
+      <div class="subject-page-count" id="sp-count"></div>
+      <div class="subject-page-progress">
+        <div class="subject-page-bar"><div class="subject-page-bar-fill" id="sp-bar" style="width:0%"></div></div>
+        <div class="subject-page-pct" id="sp-pct">0%</div>
+      </div>
+      <button class="clear-btn" onclick="clearSubject()">Clear all</button>
+    </div>
+  </div>
+  <div class="chapters-list" id="chapters-list"></div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const SUBJECTS = [
+  {
+    id: 'biology',
+    name: 'Biology',
+    icon: '🧬',
+    accent: '#4ade80',
+    accentDim: '#1a3a24',
+    subtitle: 'AQA GCSE Biology',
+    chapters: [
+      { name: 'Chapter B1 — Cell Structure and Transport', topics: [
+        { code: 'B1.1', label: 'The world of the microscope', page: 4 },
+        { code: 'B1.2', label: 'Animal and plant cells', page: 6 },
+        { code: 'B1.3', label: 'Eukaryotic and prokaryotic cells', page: 8 },
+        { code: 'B1.4', label: 'Specialisation in animal cells', page: 10 },
+        { code: 'B1.5', label: 'Specialisation in plant cells', page: 12 },
+        { code: 'B1.6', label: 'Diffusion', page: 14 },
+        { code: 'B1.7', label: 'Osmosis', page: 16 },
+        { code: 'B1.8', label: 'Osmosis in plants', page: 18 },
+        { code: 'B1.9', label: 'Active transport', page: 20 },
+        { code: 'B1.10', label: 'Exchanging materials', page: 22 },
+      ]},
+      { name: 'Chapter B2 — Cell Division', topics: [
+        { code: 'B2.1', label: 'Cell division', page: 26 },
+        { code: 'B2.2', label: 'Growth and differentiation', page: 28 },
+        { code: 'B2.3', label: 'Stem cells', page: 30 },
+        { code: 'B2.4', label: 'Stem cell dilemmas', page: 32 },
+      ]},
+      { name: 'Chapter B3 — Organisation and the Digestive System', topics: [
+        { code: 'B3.1', label: 'Tissues and organs', page: 36 },
+        { code: 'B3.2', label: 'The human digestive system', page: 38 },
+        { code: 'B3.3', label: 'The chemistry of food', page: 40 },
+        { code: 'B3.4', label: 'Catalysts and enzymes', page: 42 },
+        { code: 'B3.5', label: 'Factors affecting enzyme action', page: 44 },
+        { code: 'B3.6', label: 'How the digestive system works', page: 46 },
+        { code: 'B3.7', label: 'Making digestion efficient', page: 48 },
+      ]},
+      { name: 'Chapter B4 — Organising Animals and Plants', topics: [
+        { code: 'B4.1', label: 'The blood', page: 52 },
+        { code: 'B4.2', label: 'The blood vessels', page: 54 },
+        { code: 'B4.3', label: 'The heart', page: 56 },
+        { code: 'B4.4', label: 'Helping the heart', page: 58 },
+        { code: 'B4.5', label: 'Breathing and gas exchange', page: 60 },
+        { code: 'B4.6', label: 'Tissues and organs in plants', page: 62 },
+        { code: 'B4.7', label: 'Transport systems in plants', page: 64 },
+        { code: 'B4.8', label: 'Evaporation and transpiration', page: 66 },
+        { code: 'B4.9', label: 'Factors affecting transpiration', page: 68 },
+      ]},
+      { name: 'Chapter B5 — Communicable Diseases', topics: [
+        { code: 'B5.1', label: 'Health and disease', page: 74 },
+        { code: 'B5.2', label: 'Pathogens and disease', page: 76 },
+        { code: 'B5.3', label: 'Growing bacteria in the lab', page: 78 },
+        { code: 'B5.4', label: 'Preventing bacterial growth', page: 80 },
+        { code: 'B5.5', label: 'Preventing infections', page: 82 },
+        { code: 'B5.6', label: 'Viral diseases', page: 84 },
+        { code: 'B5.7', label: 'Bacterial diseases', page: 86 },
+        { code: 'B5.8', label: 'Diseases caused by fungi and protists', page: 88 },
+        { code: 'B5.9', label: 'Human defence responses', page: 90 },
+        { code: 'B5.10', label: 'More about plant diseases', page: 92 },
+        { code: 'B5.11', label: 'Plant defence responses', page: 94 },
+      ]},
+      { name: 'Chapter B6 — Preventing and Treating Disease', topics: [
+        { code: 'B6.1', label: 'Vaccination', page: 98 },
+        { code: 'B6.2', label: 'Antibiotics and painkillers', page: 100 },
+        { code: 'B6.3', label: 'Discovering drugs', page: 102 },
+        { code: 'B6.4', label: 'Developing drugs', page: 104 },
+        { code: 'B6.5', label: 'Making monoclonal antibodies', page: 106 },
+        { code: 'B6.6', label: 'Uses of monoclonal antibodies', page: 108 },
+      ]},
+      { name: 'Chapter B7 — Non-communicable Diseases', topics: [
+        { code: 'B7.1', label: 'Non-communicable diseases', page: 112 },
+        { code: 'B7.2', label: 'Cancer', page: 114 },
+        { code: 'B7.3', label: 'Smoking and the risk of disease', page: 116 },
+        { code: 'B7.4', label: 'Diet, exercise, and disease', page: 118 },
+        { code: 'B7.5', label: 'Alcohol and other carcinogens', page: 120 },
+      ]},
+      { name: 'Chapter B8 — Photosynthesis', topics: [
+        { code: 'B8.1', label: 'Photosynthesis', page: 124 },
+        { code: 'B8.2', label: 'The rate of photosynthesis', page: 126 },
+        { code: 'B8.3', label: 'How plants use glucose', page: 128 },
+        { code: 'B8.4', label: 'Making the most of photosynthesis', page: 130 },
+      ]},
+      { name: 'Chapter B9 — Respiration', topics: [
+        { code: 'B9.1', label: 'Aerobic respiration', page: 134 },
+        { code: 'B9.2', label: 'The response to exercise', page: 136 },
+        { code: 'B9.3', label: 'Anaerobic respiration', page: 138 },
+        { code: 'B9.4', label: 'Metabolism and the liver', page: 140 },
+      ]},
+      { name: 'Chapter B10 — The Human Nervous System', topics: [
+        { code: 'B10.1', label: 'Principles of homeostasis', page: 146 },
+        { code: 'B10.2', label: 'The structure and function of the nervous system', page: 148 },
+        { code: 'B10.3', label: 'Reflex actions', page: 150 },
+        { code: 'B10.4', label: 'The brain', page: 152 },
+        { code: 'B10.5', label: 'The eye', page: 154 },
+        { code: 'B10.6', label: 'Common problems of the eye', page: 156 },
+      ]},
+      { name: 'Chapter B11 — Hormonal Coordination', topics: [
+        { code: 'B11.1', label: 'Principles of hormonal control', page: 160 },
+        { code: 'B11.2', label: 'The control of blood glucose levels', page: 162 },
+        { code: 'B11.3', label: 'Treating diabetes', page: 164 },
+        { code: 'B11.4', label: 'The role of negative feedback', page: 166 },
+        { code: 'B11.5', label: 'Human reproduction', page: 168 },
+        { code: 'B11.6', label: 'Hormones and the menstrual cycle', page: 170 },
+        { code: 'B11.7', label: 'The artificial control of fertility', page: 172 },
+        { code: 'B11.8', label: 'Infertility treatments', page: 174 },
+        { code: 'B11.9', label: 'Plant hormones and responses', page: 176 },
+        { code: 'B11.10', label: 'Using plant hormones', page: 178 },
+      ]},
+      { name: 'Chapter B12 — Homeostasis in Action', topics: [
+        { code: 'B12.1', label: 'Controlling body temperature', page: 182 },
+        { code: 'B12.2', label: 'Removing waste products', page: 184 },
+        { code: 'B12.3', label: 'The human kidney', page: 186 },
+        { code: 'B12.4', label: 'Dialysis – an artificial kidney', page: 188 },
+        { code: 'B12.5', label: 'Kidney transplants', page: 190 },
+      ]},
+      { name: 'Chapter B13 — Reproduction', topics: [
+        { code: 'B13.1', label: 'Types of reproduction', page: 196 },
+        { code: 'B13.2', label: 'Cell division in sexual reproduction', page: 198 },
+        { code: 'B13.3', label: 'The best of both worlds', page: 200 },
+        { code: 'B13.4', label: 'DNA and the genome', page: 202 },
+        { code: 'B13.5', label: 'DNA structure and protein synthesis', page: 204 },
+        { code: 'B13.6', label: 'Gene expression and mutation', page: 206 },
+        { code: 'B13.7', label: 'Inheritance in action', page: 208 },
+        { code: 'B13.8', label: 'More about genetics', page: 210 },
+        { code: 'B13.9', label: 'Inherited disorders', page: 212 },
+        { code: 'B13.10', label: 'Screening for genetic disorders', page: 214 },
+      ]},
+      { name: 'Chapter B14 — Variation and Evolution', topics: [
+        { code: 'B14.1', label: 'Variation', page: 218 },
+        { code: 'B14.2', label: 'Evolution by natural selection', page: 220 },
+        { code: 'B14.3', label: 'Selective breeding', page: 222 },
+        { code: 'B14.4', label: 'Genetic engineering', page: 224 },
+        { code: 'B14.5', label: 'Cloning', page: 226 },
+        { code: 'B14.6', label: 'Adult cell cloning', page: 228 },
+        { code: 'B14.7', label: 'Ethics of genetic technologies', page: 230 },
+      ]},
+      { name: 'Chapter B15 — Genetics and Evolution', topics: [
+        { code: 'B15.1', label: 'The history of genetics', page: 234 },
+        { code: 'B15.2', label: 'Theories of evolution', page: 236 },
+        { code: 'B15.3', label: 'Accepting Darwin\'s ideas', page: 238 },
+        { code: 'B15.4', label: 'Evolution and speciation', page: 240 },
+        { code: 'B15.5', label: 'Evidence for evolution', page: 242 },
+        { code: 'B15.6', label: 'Fossils and extinction', page: 244 },
+        { code: 'B15.7', label: 'More about extinction', page: 246 },
+        { code: 'B15.8', label: 'Antibiotic resistant bacteria', page: 248 },
+        { code: 'B15.9', label: 'Classification', page: 250 },
+        { code: 'B15.10', label: 'New systems of classification', page: 252 },
+      ]},
+      { name: 'Chapter B16 — Adaptations, Interdependence and Competition', topics: [
+        { code: 'B16.1', label: 'The importance of communities', page: 258 },
+        { code: 'B16.2', label: 'Organisms in their environment', page: 260 },
+        { code: 'B16.3', label: 'Distribution and abundance', page: 262 },
+        { code: 'B16.4', label: 'Competition in animals', page: 264 },
+        { code: 'B16.5', label: 'Competition in plants', page: 266 },
+        { code: 'B16.6', label: 'Adapt and survive', page: 268 },
+        { code: 'B16.7', label: 'Adaptation in animals', page: 270 },
+        { code: 'B16.8', label: 'Adaptations in plants', page: 272 },
+      ]},
+      { name: 'Chapter B17 — Organising an Ecosystem', topics: [
+        { code: 'B17.1', label: 'Feeding relationships', page: 276 },
+        { code: 'B17.2', label: 'Materials cycling', page: 278 },
+        { code: 'B17.3', label: 'The carbon cycle', page: 280 },
+        { code: 'B17.4', label: 'Rates of decomposition', page: 282 },
+      ]},
+      { name: 'Chapter B18 — Biodiversity and Ecosystems', topics: [
+        { code: 'B18.1', label: 'The human population explosion', page: 286 },
+        { code: 'B18.2', label: 'Land and water pollution', page: 288 },
+        { code: 'B18.3', label: 'Air pollution', page: 290 },
+        { code: 'B18.4', label: 'Deforestation and peat destruction', page: 292 },
+        { code: 'B18.5', label: 'Global warming', page: 294 },
+        { code: 'B18.6', label: 'The impact of change', page: 296 },
+        { code: 'B18.7', label: 'Maintaining biodiversity', page: 298 },
+        { code: 'B18.8', label: 'Trophic levels and biomass', page: 300 },
+        { code: 'B18.9', label: 'Biomass transfers', page: 302 },
+        { code: 'B18.10', label: 'Factors affecting food security', page: 304 },
+        { code: 'B18.11', label: 'Making food production efficient', page: 306 },
+        { code: 'B18.12', label: 'Sustainable food production', page: 308 },
+      ]},
+    ]
+  },
+  {
+    id: 'chemistry',
+    name: 'Chemistry',
+    icon: '⚗️',
+    accent: '#f87171',
+    accentDim: '#3a1a1a',
+    subtitle: 'AQA GCSE Chemistry',
+    chapters: [
+      { name: 'Chapter C1 — Atomic Structure', topics: [
+        { code: 'C1.1', label: 'Atoms', page: 4 },
+        { code: 'C1.2', label: 'Chemical equations', page: 6 },
+        { code: 'C1.3', label: 'Separating mixtures', page: 8 },
+        { code: 'C1.4', label: 'Fractional distillation and paper chromatography', page: 10 },
+        { code: 'C1.5', label: 'History of the atom', page: 12 },
+        { code: 'C1.6', label: 'Structure of the atom', page: 14 },
+        { code: 'C1.7', label: 'Ions, atoms, and isotopes', page: 16 },
+        { code: 'C1.8', label: 'Electronic structures', page: 18 },
+      ]},
+      { name: 'Chapter C2 — The Periodic Table', topics: [
+        { code: 'C2.1', label: 'Development of the periodic table', page: 22 },
+        { code: 'C2.2', label: 'Electronic structures and the periodic table', page: 24 },
+        { code: 'C2.3', label: 'Group 1 – the alkali metals', page: 26 },
+        { code: 'C2.4', label: 'Group 7 – the halogens', page: 28 },
+        { code: 'C2.5', label: 'Explaining trends', page: 30 },
+        { code: 'C2.6', label: 'The transition elements', page: 32 },
+      ]},
+      { name: 'Chapter C3 — Structure and Bonding', topics: [
+        { code: 'C3.1', label: 'States of matter', page: 36 },
+        { code: 'C3.2', label: 'Atoms into ions', page: 38 },
+        { code: 'C3.3', label: 'Ionic bonding', page: 40 },
+        { code: 'C3.4', label: 'Giant ionic structures', page: 42 },
+        { code: 'C3.5', label: 'Covalent bonding', page: 44 },
+        { code: 'C3.6', label: 'Structure of simple molecules', page: 46 },
+        { code: 'C3.7', label: 'Giant covalent structures', page: 48 },
+        { code: 'C3.8', label: 'Fullerenes and graphene', page: 50 },
+        { code: 'C3.9', label: 'Bonding in metals', page: 52 },
+        { code: 'C3.10', label: 'Giant metallic structures', page: 54 },
+        { code: 'C3.11', label: 'Nanoparticles', page: 56 },
+        { code: 'C3.12', label: 'Applications of nanoparticles', page: 58 },
+      ]},
+      { name: 'Chapter C4 — Chemical Calculations', topics: [
+        { code: 'C4.1', label: 'Relative masses and moles', page: 62 },
+        { code: 'C4.2', label: 'Equations and calculations', page: 64 },
+        { code: 'C4.3', label: 'From masses to balanced equations', page: 66 },
+        { code: 'C4.4', label: 'The yield of a chemical reaction', page: 68 },
+        { code: 'C4.5', label: 'Atom economy', page: 70 },
+        { code: 'C4.6', label: 'Expressing concentrations', page: 72 },
+        { code: 'C4.7', label: 'Titrations', page: 74 },
+        { code: 'C4.8', label: 'Titration calculations', page: 76 },
+        { code: 'C4.9', label: 'Volumes of gases', page: 78 },
+      ]},
+      { name: 'Chapter C5 — Chemical Changes', topics: [
+        { code: 'C5.1', label: 'The reactivity series', page: 84 },
+        { code: 'C5.2', label: 'Displacement reactions', page: 86 },
+        { code: 'C5.3', label: 'Extracting metals', page: 88 },
+        { code: 'C5.4', label: 'Salts from metals', page: 90 },
+        { code: 'C5.5', label: 'Salts from insoluble bases', page: 92 },
+        { code: 'C5.6', label: 'Making more salts', page: 94 },
+        { code: 'C5.7', label: 'Neutralisation and the pH scale', page: 96 },
+        { code: 'C5.8', label: 'Strong and weak acids', page: 98 },
+      ]},
+      { name: 'Chapter C6 — Electrolysis', topics: [
+        { code: 'C6.1', label: 'Introduction to electrolysis', page: 102 },
+        { code: 'C6.2', label: 'Changes at the electrodes', page: 104 },
+        { code: 'C6.3', label: 'The extraction of aluminium', page: 106 },
+        { code: 'C6.4', label: 'Electrolysis of aqueous solutions', page: 108 },
+      ]},
+      { name: 'Chapter C7 — Energy Changes', topics: [
+        { code: 'C7.1', label: 'Exothermic and endothermic reactions', page: 112 },
+        { code: 'C7.2', label: 'Using energy transfers from reactions', page: 114 },
+        { code: 'C7.3', label: 'Reaction profiles', page: 116 },
+        { code: 'C7.4', label: 'Bond energy calculations', page: 118 },
+        { code: 'C7.5', label: 'Chemical cells and batteries', page: 120 },
+        { code: 'C7.6', label: 'Fuel cells', page: 122 },
+      ]},
+      { name: 'Chapter C8 — Rates and Equilibrium', topics: [
+        { code: 'C8.1', label: 'Rate of reaction', page: 128 },
+        { code: 'C8.2', label: 'Collision theory and surface area', page: 130 },
+        { code: 'C8.3', label: 'The effect of temperature', page: 132 },
+        { code: 'C8.4', label: 'The effect of concentration and pressure', page: 134 },
+        { code: 'C8.5', label: 'The effect of catalysts', page: 136 },
+        { code: 'C8.6', label: 'Reversible reactions', page: 138 },
+        { code: 'C8.7', label: 'Energy and reversible reactions', page: 140 },
+        { code: 'C8.8', label: 'Dynamic equilibrium', page: 142 },
+        { code: 'C8.9', label: 'Altering conditions', page: 144 },
+      ]},
+      { name: 'Chapter C9 — Crude Oil and Fuels', topics: [
+        { code: 'C9.1', label: 'Hydrocarbons', page: 148 },
+        { code: 'C9.2', label: 'Fractional distillation of oil', page: 150 },
+        { code: 'C9.3', label: 'Burning hydrocarbon fuels', page: 152 },
+        { code: 'C9.4', label: 'Cracking hydrocarbons', page: 154 },
+      ]},
+      { name: 'Chapter C10 — Organic Reactions', topics: [
+        { code: 'C10.1', label: 'Reactions of the alkenes', page: 158 },
+        { code: 'C10.2', label: 'Structures of alcohols, carboxylic acids, and esters', page: 160 },
+        { code: 'C10.3', label: 'Reactions and uses of alcohols', page: 162 },
+        { code: 'C10.4', label: 'Carboxylic acids and esters', page: 164 },
+      ]},
+      { name: 'Chapter C11 — Polymers', topics: [
+        { code: 'C11.1', label: 'Addition polymerisation', page: 168 },
+        { code: 'C11.2', label: 'Condensation polymerisation', page: 170 },
+        { code: 'C11.3', label: 'Natural polymers', page: 172 },
+        { code: 'C11.4', label: 'DNA', page: 174 },
+      ]},
+      { name: 'Chapter C12 — Chemical Analysis', topics: [
+        { code: 'C12.1', label: 'Pure substances and mixtures', page: 180 },
+        { code: 'C12.2', label: 'Analysing chromatograms', page: 182 },
+        { code: 'C12.3', label: 'Testing for gases', page: 184 },
+        { code: 'C12.4', label: 'Tests for positive ions', page: 186 },
+        { code: 'C12.5', label: 'Tests for negative ions', page: 188 },
+        { code: 'C12.6', label: 'Instrumental analysis', page: 190 },
+      ]},
+      { name: 'Chapter C13 — The Earth\'s Atmosphere', topics: [
+        { code: 'C13.1', label: 'History of our atmosphere', page: 194 },
+        { code: 'C13.2', label: 'Our evolving atmosphere', page: 196 },
+        { code: 'C13.3', label: 'Greenhouse gases', page: 198 },
+        { code: 'C13.4', label: 'Global climate change', page: 200 },
+        { code: 'C13.5', label: 'Atmospheric pollutants', page: 202 },
+      ]},
+      { name: 'Chapter C14 — The Earth\'s Resources', topics: [
+        { code: 'C14.1', label: 'Finite and renewable resources', page: 206 },
+        { code: 'C14.2', label: 'Water safe to drink', page: 208 },
+        { code: 'C14.3', label: 'Treating waste water', page: 210 },
+        { code: 'C14.4', label: 'Extracting metals from ores', page: 212 },
+        { code: 'C14.5', label: 'Life cycle assessments', page: 214 },
+        { code: 'C14.6', label: 'Reduce, reuse, and recycle', page: 216 },
+      ]},
+      { name: 'Chapter C15 — Using Our Resources', topics: [
+        { code: 'C15.1', label: 'Rusting', page: 220 },
+        { code: 'C15.2', label: 'Useful alloys', page: 222 },
+        { code: 'C15.3', label: 'The properties of polymers', page: 224 },
+        { code: 'C15.4', label: 'Glass, ceramics, and composites', page: 226 },
+        { code: 'C15.5', label: 'Making ammonia – the Haber process', page: 228 },
+        { code: 'C15.6', label: 'The economics of the Haber process', page: 230 },
+        { code: 'C15.7', label: 'Making fertilisers in the lab', page: 232 },
+        { code: 'C15.8', label: 'Making fertilisers in industry', page: 234 },
+      ]},
+    ]
+  },
+  {
+    id: 'physics',
+    name: 'Physics',
+    icon: '⚡',
+    accent: '#60a5fa',
+    accentDim: '#1a2a3a',
+    subtitle: 'AQA GCSE Physics',
+    chapters: [
+      { name: 'Chapter P1 — Conservation and Dissipation of Energy', topics: [
+        { code: 'P1.1', label: 'Changes in energy stores', page: 4 },
+        { code: 'P1.2', label: 'Conservation of energy', page: 6 },
+        { code: 'P1.3', label: 'Energy and work', page: 8 },
+        { code: 'P1.4', label: 'Gravitational potential energy stores', page: 10 },
+        { code: 'P1.5', label: 'Kinetic energy and elastic energy stores', page: 12 },
+        { code: 'P1.6', label: 'Energy dissipation', page: 14 },
+        { code: 'P1.7', label: 'Energy and efficiency', page: 16 },
+        { code: 'P1.8', label: 'Electrical appliances', page: 18 },
+        { code: 'P1.9', label: 'Energy and power', page: 20 },
+      ]},
+      { name: 'Chapter P2 — Energy Transfer by Heating', topics: [
+        { code: 'P2.1', label: 'Energy transfer by conduction', page: 24 },
+        { code: 'P2.2', label: 'Infrared radiation', page: 26 },
+        { code: 'P2.3', label: 'More about infrared radiation', page: 28 },
+        { code: 'P2.4', label: 'Specific heat capacity', page: 30 },
+        { code: 'P2.5', label: 'Heating and insulating buildings', page: 32 },
+      ]},
+      { name: 'Chapter P3 — Energy Resources', topics: [
+        { code: 'P3.1', label: 'Energy demands', page: 36 },
+        { code: 'P3.2', label: 'Energy from wind and water', page: 38 },
+        { code: 'P3.3', label: 'Power from the Sun and the Earth', page: 40 },
+        { code: 'P3.4', label: 'Energy and the environment', page: 42 },
+        { code: 'P3.5', label: 'Big energy issues', page: 44 },
+      ]},
+      { name: 'Chapter P4 — Electric Circuits', topics: [
+        { code: 'P4.1', label: 'Electrical charges and fields', page: 50 },
+        { code: 'P4.2', label: 'Current and charge', page: 52 },
+        { code: 'P4.3', label: 'Potential difference and resistance', page: 54 },
+        { code: 'P4.4', label: 'Component characteristics', page: 56 },
+        { code: 'P4.5', label: 'Series circuits', page: 58 },
+        { code: 'P4.6', label: 'Parallel circuits', page: 60 },
+      ]},
+      { name: 'Chapter P5 — Electricity in the Home', topics: [
+        { code: 'P5.1', label: 'Alternating current', page: 64 },
+        { code: 'P5.2', label: 'Cables and plugs', page: 66 },
+        { code: 'P5.3', label: 'Electrical power and potential difference', page: 68 },
+        { code: 'P5.4', label: 'Electrical currents and energy transfer', page: 70 },
+        { code: 'P5.5', label: 'Appliances and efficiency', page: 72 },
+      ]},
+      { name: 'Chapter P6 — Molecules and Matter', topics: [
+        { code: 'P6.1', label: 'Density', page: 76 },
+        { code: 'P6.2', label: 'States of matter', page: 78 },
+        { code: 'P6.3', label: 'Changes of state', page: 80 },
+        { code: 'P6.4', label: 'Internal energy', page: 82 },
+        { code: 'P6.5', label: 'Specific latent heat', page: 84 },
+        { code: 'P6.6', label: 'Gas pressure and temperature', page: 86 },
+        { code: 'P6.7', label: 'Gas pressure and volume', page: 88 },
+      ]},
+      { name: 'Chapter P7 — Radioactivity', topics: [
+        { code: 'P7.1', label: 'Atoms and radiation', page: 92 },
+        { code: 'P7.2', label: 'The discovery of the nucleus', page: 94 },
+        { code: 'P7.3', label: 'Changes in the nucleus', page: 96 },
+        { code: 'P7.4', label: 'More about alpha, beta, and gamma radiation', page: 98 },
+        { code: 'P7.5', label: 'Activity and half-life', page: 100 },
+        { code: 'P7.6', label: 'Nuclear radiation in medicine', page: 102 },
+        { code: 'P7.7', label: 'Nuclear fission', page: 104 },
+        { code: 'P7.8', label: 'Nuclear fusion', page: 106 },
+        { code: 'P7.9', label: 'Nuclear issues', page: 108 },
+      ]},
+      { name: 'Chapter P8 — Forces in Balance', topics: [
+        { code: 'P8.1', label: 'Vectors and scalars', page: 114 },
+        { code: 'P8.2', label: 'Forces between objects', page: 116 },
+        { code: 'P8.3', label: 'Resultant forces', page: 118 },
+        { code: 'P8.4', label: 'Moments at work', page: 120 },
+        { code: 'P8.5', label: 'More about levers and gears', page: 122 },
+        { code: 'P8.6', label: 'Centre of mass', page: 124 },
+        { code: 'P8.7', label: 'Moments and equilibrium', page: 126 },
+        { code: 'P8.8', label: 'The parallelogram of forces', page: 128 },
+        { code: 'P8.9', label: 'Resolution of forces', page: 130 },
+      ]},
+      { name: 'Chapter P9 — Motion', topics: [
+        { code: 'P9.1', label: 'Speed and distance–time graphs', page: 134 },
+        { code: 'P9.2', label: 'Velocity and acceleration', page: 136 },
+        { code: 'P9.3', label: 'More about velocity–time graphs', page: 138 },
+        { code: 'P9.4', label: 'Analysing motion graphs', page: 140 },
+      ]},
+      { name: 'Chapter P10 — Force and Motion', topics: [
+        { code: 'P10.1', label: 'Force and acceleration', page: 144 },
+        { code: 'P10.2', label: 'Weight and terminal velocity', page: 146 },
+        { code: 'P10.3', label: 'Forces and braking', page: 148 },
+        { code: 'P10.4', label: 'Momentum', page: 150 },
+        { code: 'P10.5', label: 'Using conservation of momentum', page: 152 },
+        { code: 'P10.6', label: 'Impact forces', page: 154 },
+        { code: 'P10.7', label: 'Safety first', page: 156 },
+        { code: 'P10.8', label: 'Forces and elasticity', page: 158 },
+      ]},
+      { name: 'Chapter P11 — Force and Pressure', topics: [
+        { code: 'P11.1', label: 'Pressure and surfaces', page: 162 },
+        { code: 'P11.2', label: 'Pressure in a liquid at rest', page: 164 },
+        { code: 'P11.3', label: 'Atmospheric pressure', page: 166 },
+        { code: 'P11.4', label: 'Upthrust and flotation', page: 168 },
+      ]},
+      { name: 'Chapter P12 — Wave Properties', topics: [
+        { code: 'P12.1', label: 'The nature of waves', page: 174 },
+        { code: 'P12.2', label: 'The properties of waves', page: 176 },
+        { code: 'P12.3', label: 'Reflection and refraction', page: 178 },
+        { code: 'P12.4', label: 'More about waves', page: 180 },
+        { code: 'P12.5', label: 'Sound waves', page: 182 },
+        { code: 'P12.6', label: 'The uses of ultrasound', page: 184 },
+        { code: 'P12.7', label: 'Seismic waves', page: 186 },
+      ]},
+      { name: 'Chapter P13 — Electromagnetism', topics: [
+        { code: 'P13.1', label: 'The electromagnetic spectrum', page: 190 },
+        { code: 'P13.2', label: 'Light, infrared, microwaves, and radio waves', page: 192 },
+        { code: 'P13.3', label: 'Communications', page: 194 },
+        { code: 'P13.4', label: 'Ultraviolet waves, X-rays, and gamma rays', page: 196 },
+        { code: 'P13.5', label: 'X-rays in medicine', page: 198 },
+      ]},
+      { name: 'Chapter P14 — Light', topics: [
+        { code: 'P14.1', label: 'Reflection of light', page: 202 },
+        { code: 'P14.2', label: 'Refraction of light', page: 204 },
+        { code: 'P14.3', label: 'Light and colour', page: 206 },
+        { code: 'P14.4', label: 'Using lenses', page: 208 },
+        { code: 'P14.5', label: 'Lenses', page: 210 },
+        { code: 'P14.6', label: 'The eye', page: 212 },
+      ]},
+      { name: 'Chapter P15 — Electromagnetism', topics: [
+        { code: 'P15.1', label: 'Magnetic fields', page: 214 },
+        { code: 'P15.2', label: 'Magnetic fields of electric currents', page: 216 },
+        { code: 'P15.3', label: 'The motor effect', page: 218 },
+        { code: 'P15.4', label: 'The alternating-current generator', page: 220 },
+        { code: 'P15.5', label: 'Transformers', page: 222 },
+        { code: 'P15.6', label: 'The generator effect', page: 224 },
+        { code: 'P15.7', label: 'Transformers in action', page: 226 },
+        { code: 'P15.8', label: 'Electromagnets in devices', page: 228 },
+      ]},
+      { name: 'Chapter P16 — Space', topics: [
+        { code: 'P16.1', label: 'Formation of the Solar System', page: 232 },
+        { code: 'P16.2', label: 'The life history of a star', page: 234 },
+        { code: 'P16.3', label: 'Planets, satellites, and orbits', page: 236 },
+        { code: 'P16.4', label: 'The expanding universe', page: 238 },
+        { code: 'P16.5', label: 'The beginning and future of the Universe', page: 240 },
+      ]},
+    ]
+  },
+  {
+    id: 'maths',
+    name: 'Maths',
+    icon: '📐',
+    accent: '#fb923c',
+    accentDim: '#3a2010',
+    subtitle: 'GCSE Mathematics',
+    chapters: [
+      { name: 'Chapter 1 — Calculations 1', topics: [
+        { code: '', label: 'Place value and rounding', page: 2 },
+        { code: '', label: 'Adding and subtracting', page: 4 },
+        { code: '', label: 'Multiplying and dividing', page: 8 },
+        { code: '', label: 'Summary and review', page: 12 },
+      ]},
+      { name: 'Chapter 2 — Expressions', topics: [
+        { code: '', label: 'Simplifying expressions', page: 20 },
+        { code: '', label: 'Indices', page: 22 },
+        { code: '', label: 'Expanding and factorising 1', page: 26 },
+        { code: '', label: 'Algebraic fractions', page: 30 },
+        { code: '', label: 'Summary and review', page: 34 },
+      ]},
+      { name: 'Chapter 3 — Angles and Polygons', topics: [
+        { code: '', label: 'Angles and lines', page: 44 },
+        { code: '', label: 'Triangles and quadrilaterals', page: 48 },
+        { code: '', label: 'Congruence and similarity', page: 52 },
+        { code: '', label: 'Angles in polygons', page: 56 },
+        { code: '', label: 'Summary and review', page: 60 },
+      ]},
+      { name: 'Chapter 4 — Handling Data 1', topics: [
+        { code: '', label: 'Sampling', page: 66 },
+        { code: '', label: 'Organising data', page: 70 },
+        { code: '', label: 'Representing data 1', page: 74 },
+        { code: '', label: 'Averages and spread 1', page: 78 },
+        { code: '', label: 'Summary and review', page: 82 },
+      ]},
+      { name: 'Chapter 5 — Fractions, Decimals and Percentages', topics: [
+        { code: '', label: 'Fractions and percentages', page: 88 },
+        { code: '', label: 'Calculations with fractions', page: 92 },
+        { code: '', label: 'Fractions, decimals and percentages', page: 96 },
+        { code: '', label: 'Summary and review', page: 100 },
+      ]},
+      { name: 'Chapter 6 — Formulae and Functions', topics: [
+        { code: '', label: 'Formulae', page: 108 },
+        { code: '', label: 'Functions', page: 112 },
+        { code: '', label: 'Equivalences in algebra', page: 116 },
+        { code: '', label: 'Expanding and factorising 2', page: 120 },
+        { code: '', label: 'Summary and review', page: 124 },
+      ]},
+      { name: 'Chapter 7 — Working in 2D', topics: [
+        { code: '', label: 'Measuring lengths and angles', page: 130 },
+        { code: '', label: 'Area of a 2D shape', page: 132 },
+        { code: '', label: 'Transformations 1', page: 136 },
+        { code: '', label: 'Transformations 2', page: 140 },
+        { code: '', label: 'Summary and review', page: 144 },
+      ]},
+      { name: 'Chapter 8 — Probability', topics: [
+        { code: '', label: 'Probability experiments', page: 152 },
+        { code: '', label: 'Theoretical probability', page: 154 },
+        { code: '', label: 'Mutually exclusive events', page: 158 },
+        { code: '', label: 'Summary and review', page: 162 },
+      ]},
+      { name: 'Chapter 9 — Measures and Accuracy', topics: [
+        { code: '', label: 'Estimation and approximation', page: 172 },
+        { code: '', label: 'Calculator methods', page: 176 },
+        { code: '', label: 'Measures and accuracy', page: 180 },
+        { code: '', label: 'Summary and review', page: 184 },
+      ]},
+      { name: 'Chapter 10 — Equations and Inequalities', topics: [
+        { code: '', label: 'Solving linear equations', page: 190 },
+        { code: '', label: 'Quadratic equations', page: 194 },
+        { code: '', label: 'Simultaneous equations', page: 198 },
+        { code: '', label: 'Approximate solutions', page: 202 },
+        { code: '', label: 'Inequalities', page: 206 },
+        { code: '', label: 'Summary and review', page: 210 },
+      ]},
+      { name: 'Chapter 11 — Circles and Constructions', topics: [
+        { code: '', label: 'Circles 1', page: 218 },
+        { code: '', label: 'Circles 2', page: 222 },
+        { code: '', label: 'Circle theorems', page: 226 },
+        { code: '', label: 'Constructions and loci', page: 232 },
+        { code: '', label: 'Summary and review', page: 236 },
+      ]},
+      { name: 'Chapter 12 — Ratio and Proportion', topics: [
+        { code: '', label: 'Proportion', page: 242 },
+        { code: '', label: 'Ratio', page: 246 },
+        { code: '', label: 'Percentage change', page: 250 },
+        { code: '', label: 'Summary and review', page: 254 },
+      ]},
+      { name: 'Chapter 13 — Factors, Powers and Roots', topics: [
+        { code: '', label: 'Factors and multiples', page: 262 },
+        { code: '', label: 'Powers and roots', page: 266 },
+        { code: '', label: 'Surds', page: 270 },
+        { code: '', label: 'Summary and review', page: 274 },
+      ]},
+      { name: 'Chapter 14 — Graphs 1', topics: [
+        { code: '', label: 'Equation of a straight line', page: 280 },
+        { code: '', label: 'Linear and quadratic functions', page: 284 },
+        { code: '', label: 'Properties of quadratic functions', page: 288 },
+        { code: '', label: 'Kinematic graphs', page: 292 },
+        { code: '', label: 'Summary and review', page: 296 },
+      ]},
+      { name: 'Chapter 15 — Working in 3D', topics: [
+        { code: '', label: '3D shapes', page: 302 },
+        { code: '', label: 'Volume of a prism', page: 306 },
+        { code: '', label: 'Volume and surface area', page: 310 },
+        { code: '', label: 'Summary and review', page: 316 },
+      ]},
+      { name: 'Chapter 16 — Handling Data 2', topics: [
+        { code: '', label: 'Frequency diagrams', page: 324 },
+        { code: '', label: 'Averages and spread 2', page: 328 },
+        { code: '', label: 'Box plots and cumulative frequency graphs', page: 332 },
+        { code: '', label: 'Scatter graphs and correlation', page: 336 },
+        { code: '', label: 'Time series', page: 340 },
+        { code: '', label: 'Summary and review', page: 344 },
+      ]},
+      { name: 'Chapter 17 — Calculations 2', topics: [
+        { code: '', label: 'Calculating with roots and indices', page: 350 },
+        { code: '', label: 'Exact calculations', page: 354 },
+        { code: '', label: 'Standard form', page: 358 },
+        { code: '', label: 'Summary and review', page: 362 },
+      ]},
+      { name: 'Chapter 18 — Graphs 2', topics: [
+        { code: '', label: 'Cubic and reciprocal functions', page: 368 },
+        { code: '', label: 'Exponential and trigonometric functions', page: 372 },
+        { code: '', label: 'Real-life graphs', page: 376 },
+        { code: '', label: 'Gradients and areas under graphs', page: 380 },
+        { code: '', label: 'Equation of a circle', page: 384 },
+        { code: '', label: 'Summary and review', page: 388 },
+      ]},
+      { name: 'Chapter 19 — Pythagoras and Trigonometry', topics: [
+        { code: '', label: 'Pythagoras\' theorem', page: 396 },
+        { code: '', label: 'Trigonometry 1', page: 400 },
+        { code: '', label: 'Trigonometry 2', page: 404 },
+        { code: '', label: 'Pythagoras and trigonometry problems', page: 408 },
+        { code: '', label: 'Vectors', page: 412 },
+        { code: '', label: 'Summary and review', page: 416 },
+      ]},
+      { name: 'Chapter 20 — Combined Events', topics: [
+        { code: '', label: 'Sets', page: 422 },
+        { code: '', label: 'Possibility spaces', page: 426 },
+        { code: '', label: 'Tree diagrams', page: 430 },
+        { code: '', label: 'Conditional probability', page: 434 },
+        { code: '', label: 'Summary and review', page: 438 },
+      ]},
+      { name: 'Chapter 21 — Sequences', topics: [
+        { code: '', label: 'Linear sequences', page: 446 },
+        { code: '', label: 'Quadratic sequences', page: 450 },
+        { code: '', label: 'Special sequences', page: 454 },
+        { code: '', label: 'Summary and review', page: 458 },
+      ]},
+      { name: 'Chapter 22 — Units and Proportionality', topics: [
+        { code: '', label: 'Compound units', page: 464 },
+        { code: '', label: 'Converting between units', page: 468 },
+        { code: '', label: 'Direct and inverse proportion', page: 472 },
+        { code: '', label: 'Rates of change', page: 476 },
+        { code: '', label: 'Growth and decay', page: 480 },
+        { code: '', label: 'Summary and review', page: 484 },
+      ]},
+    ]
+  },
+  {
+    id: 'french',
+    name: 'French',
+    icon: '🇫🇷',
+    accent: '#e879f9',
+    accentDim: '#2d1030',
+    subtitle: 'Edexcel GCSE French',
+    chapters: [
+      { name: 'Theme 1 — People and Discourse', topics: [
+        { code: '', label: 'My life, my family and my friends', page: 0 },
+        { code: '', label: 'Leisure and free time', page: 0 },
+        { code: '', label: 'Daily life and routine', page: 0 },
+      ]},
+      { name: 'Theme 2 — Popular Culture and the Media', topics: [
+        { code: '', label: 'Media and culture', page: 0 },
+        { code: '', label: 'Technology in everyday life', page: 0 },
+        { code: '', label: 'Festivals and traditions', page: 0 },
+      ]},
+      { name: 'Theme 3 — Local Area, Holiday and Travel', topics: [
+        { code: '', label: 'My local area', page: 0 },
+        { code: '', label: 'Holidays and travel', page: 0 },
+        { code: '', label: 'Regions of France', page: 0 },
+      ]},
+      { name: 'Theme 4 — School and Future Plans', topics: [
+        { code: '', label: 'School life', page: 0 },
+        { code: '', label: 'Future education and employment', page: 0 },
+      ]},
+      { name: 'Theme 5 — Global Dimensions and the Environment', topics: [
+        { code: '', label: 'Environmental issues', page: 0 },
+        { code: '', label: 'Social and global issues', page: 0 },
+      ]},
+    ]
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    icon: '📊',
+    accent: '#a78bfa',
+    accentDim: '#251a3a',
+    subtitle: 'Edexcel GCSE Business',
+    chapters: [
+      { name: 'Theme 1 — Investigating Small Businesses', topics: [
+        { code: '1.1', label: 'Enterprise and Entrepreneurship', page: 0 },
+        { code: '1.2', label: 'Spotting a Business Opportunity', page: 0 },
+        { code: '1.3', label: 'Putting a Business Idea into Practice', page: 0 },
+        { code: '1.4', label: 'Making the Business Effective', page: 0 },
+        { code: '1.5', label: 'Understanding External Influences on Business', page: 0 },
+      ]},
+      { name: 'Theme 2 — Building a Business', topics: [
+        { code: '2.1', label: 'Growing the Business', page: 0 },
+        { code: '2.2', label: 'Making Marketing Decisions', page: 0 },
+        { code: '2.3', label: 'Making Operational Decisions', page: 0 },
+        { code: '2.4', label: 'Making Financial Decisions', page: 0 },
+        { code: '2.5', label: 'Making Human Resource Decisions', page: 0 },
+      ]},
+    ]
+  },
+  {
+    id: 'computing',
+    name: 'Computing',
+    icon: '💻',
+    accent: '#22d3ee',
+    accentDim: '#0a2a30',
+    subtitle: 'AQA GCSE Computer Science',
+    chapters: [
+      { name: 'Paper 1 — Computational Thinking and Problem Solving', topics: [
+        { code: '3.1', label: 'Fundamentals of Algorithms (pseudocode, flowcharts, complexity, searching, sorting)', page: 0 },
+        { code: '3.2', label: 'Programming — Data types, concepts, operations, arrays, validation, subroutines', page: 0 },
+      ]},
+      { name: 'Paper 2 — Computing Concepts', topics: [
+        { code: '3.3', label: 'Fundamentals of Data Representation (number bases, encoding, compression)', page: 0 },
+        { code: '3.4', label: 'Computer Systems (CPU architecture, hardware/software, logic gates, storage)', page: 0 },
+        { code: '3.5', label: 'Fundamentals of Computer Networks (topology, protocols, IP/MAC addressing)', page: 0 },
+        { code: '3.6', label: 'Cyber Security (malware, social engineering, firewalls, encryption)', page: 0 },
+        { code: '3.7', label: 'Databases (relational concepts, SQL — SELECT, FROM, WHERE, JOIN)', page: 0 },
+        { code: '3.8', label: 'Ethical, Legal and Environmental Impacts (DPA 2018, CMA 1990, CDPA)', page: 0 },
+      ]},
+    ]
+  },
+  {
+    id: 'english-lit',
+    name: 'English Lit',
+    icon: '📚',
+    accent: '#f9a8d4',
+    accentDim: '#3a1a28',
+    subtitle: 'AQA GCSE English Literature',
+    chapters: [
+      { name: 'Paper 1 — Shakespeare', topics: [
+        { code: '', label: 'Macbeth / Romeo and Juliet — language analysis', page: 0 },
+        { code: '', label: 'Macbeth / Romeo and Juliet — themes and character', page: 0 },
+      ]},
+      { name: 'Paper 1 — 19th-Century Novel', topics: [
+        { code: '', label: 'A Christmas Carol — character and context', page: 0 },
+        { code: '', label: 'A Christmas Carol — societal commentary and themes', page: 0 },
+      ]},
+      { name: 'Paper 2 — Modern Texts', topics: [
+        { code: '', label: 'An Inspector Calls — social responsibility and class', page: 0 },
+        { code: '', label: 'An Inspector Calls — gender, history and context', page: 0 },
+      ]},
+      { name: 'Paper 2 — Poetry Anthology (Power and Conflict)', topics: [
+        { code: '', label: 'Ozymandias', page: 0 },
+        { code: '', label: 'London', page: 0 },
+        { code: '', label: 'The Prelude', page: 0 },
+        { code: '', label: 'My Last Duchess', page: 0 },
+        { code: '', label: 'The Charge of the Light Brigade', page: 0 },
+        { code: '', label: 'Exposure', page: 0 },
+        { code: '', label: 'Storm on the Island', page: 0 },
+        { code: '', label: 'Bayonet Charge', page: 0 },
+        { code: '', label: 'Remains', page: 0 },
+        { code: '', label: 'Poppies', page: 0 },
+        { code: '', label: 'War Photographer', page: 0 },
+        { code: '', label: 'Tissue', page: 0 },
+        { code: '', label: 'The Émigrée', page: 0 },
+        { code: '', label: 'Kamikaze', page: 0 },
+        { code: '', label: 'Checking Out Me History', page: 0 },
+      ]},
+      { name: 'Paper 2 — Unseen Poetry', topics: [
+        { code: '', label: 'Unseen poem — language, form and structure analysis', page: 0 },
+        { code: '', label: 'Unseen poem — comparative analysis of two unseen texts', page: 0 },
+      ]},
+    ]
+  },
+  {
+    id: 'english-lang',
+    name: 'English Lang',
+    icon: '✍️',
+    accent: '#fde68a',
+    accentDim: '#3a3010',
+    subtitle: 'AQA GCSE English Language',
+    chapters: [
+      { name: 'Paper 1 — Section A: Reading (Literary Fiction)', topics: [
+        { code: 'Q1', label: 'Identify and list literal information from the text', page: 0 },
+        { code: 'Q2', label: 'Language analysis — literary devices and sentence structures', page: 0 },
+        { code: 'Q3', label: 'Structural features and narrative pacing', page: 0 },
+        { code: 'Q4', label: 'Critical evaluation of a given statement about the text', page: 0 },
+      ]},
+      { name: 'Paper 1 — Section B: Writing', topics: [
+        { code: '', label: 'Descriptive or narrative writing from an image/scenario prompt', page: 0 },
+      ]},
+      { name: 'Paper 2 — Section A: Reading (Non-Fiction)', topics: [
+        { code: 'Q1', label: 'True/false text comprehension', page: 0 },
+        { code: 'Q2', label: 'Synthesising similarities/differences across two texts', page: 0 },
+        { code: 'Q3', label: 'Linguistic and rhetorical analysis of one text', page: 0 },
+        { code: 'Q4', label: 'Comparative evaluation of writers\' viewpoints and methods', page: 0 },
+      ]},
+      { name: 'Paper 2 — Section B: Writing', topics: [
+        { code: '', label: 'Transactional writing — essay, letter, speech, leaflet or article', page: 0 },
+      ]},
+      { name: 'Non-Examination Assessment', topics: [
+        { code: '', label: 'Spoken Language Endorsement — presentation and Q&A', page: 0 },
+      ]},
+    ]
+  },
+  {
+    id: 'geography',
+    name: 'Geography',
+    icon: '🌍',
+    accent: '#86efac',
+    accentDim: '#1a3020',
+    subtitle: 'AQA GCSE Geography',
+    chapters: [
+      { name: 'Unit 1 Section A — The Challenge of Natural Hazards', topics: [
+        { code: '', label: 'Tectonic Systems — plate boundaries, HIC vs LIC case studies', page: 0 },
+        { code: '', label: 'Meteorological Hazards — tropical storms, UK extreme weather', page: 0 },
+        { code: '', label: 'Climate Change — Quaternary records, causes, mitigation and adaptation', page: 0 },
+      ]},
+      { name: 'Unit 1 Section B — The Living World', topics: [
+        { code: '', label: 'Ecosystem Ecology — food webs, tropical rainforest deforestation', page: 0 },
+        { code: '', label: 'Hot Deserts — ecosystems, development, desertification', page: 0 },
+      ]},
+      { name: 'Unit 1 Section C — Physical Landscapes in the UK', topics: [
+        { code: '', label: 'Coastal Geomorphology — erosion, longshore drift, management', page: 0 },
+        { code: '', label: 'Fluvial Systems — river profiles, landforms, flood management', page: 0 },
+      ]},
+      { name: 'Unit 2 Section A — Urban Issues and Challenges', topics: [
+        { code: '', label: 'Global urbanisation, megacities, LIC squatter settlements', page: 0 },
+        { code: '', label: 'UK urban regeneration — inequality and post-industrial deprivation', page: 0 },
+      ]},
+      { name: 'Unit 2 Section B — The Changing Economic World', topics: [
+        { code: '', label: 'Demographic Transition Model, aid architectures, TNCs', page: 0 },
+        { code: '', label: 'UK post-industrial economy — science parks, North-South divide', page: 0 },
+      ]},
+      { name: 'Unit 2 Section C — The Challenge of Resource Management', topics: [
+        { code: '', label: 'Global Food, Water and Energy security', page: 0 },
+        { code: '', label: 'UK supply chain pressures and sustainability models', page: 0 },
+      ]},
+      { name: 'Unit 3 — Geographical Applications and Skills', topics: [
+        { code: '', label: 'Issue Evaluation — pre-released resource portfolio critique', page: 0 },
+        { code: '', label: 'Fieldwork — River Chess (physical) and Slough CBD (human)', page: 0 },
+      ]},
+    ]
+  },
+];
+
+// ===================== COOKIES =====================
+function getCookieData() {
+  const match = document.cookie.match(/gcse_tracker=([^;]+)/);
+  if (!match) return {};
+  try { return JSON.parse(decodeURIComponent(match[1])); } catch { return {}; }
+}
+
+function saveCookieData(data) {
+  const exp = new Date();
+  exp.setFullYear(exp.getFullYear() + 2);
+  document.cookie = `gcse_tracker=${encodeURIComponent(JSON.stringify(data))}; expires=${exp.toUTCString()}; path=/; SameSite=Lax`;
+}
+
+let cookieData = getCookieData();
+
+function isTopicDone(subjectId, topicKey) {
+  return !!(cookieData[subjectId] && cookieData[subjectId][topicKey]);
+}
+
+function setTopicDone(subjectId, topicKey, val) {
+  if (!cookieData[subjectId]) cookieData[subjectId] = {};
+  if (val) cookieData[subjectId][topicKey] = 1;
+  else delete cookieData[subjectId][topicKey];
+  saveCookieData(cookieData);
+}
+
+function getTopicKey(chIdx, tIdx) { return `${chIdx}_${tIdx}`; }
+
+// ===================== PROGRESS =====================
+function subjectProgress(subjectId) {
+  const sub = SUBJECTS.find(s => s.id === subjectId);
+  if (!sub || !sub.chapters.length) return { done: 0, total: 0 };
+  let done = 0, total = 0;
+  sub.chapters.forEach((ch, ci) => ch.topics.forEach((_, ti) => {
+    total++;
+    if (isTopicDone(subjectId, getTopicKey(ci, ti))) done++;
+  }));
+  return { done, total };
+}
+
+function globalProgress() {
+  let done = 0, total = 0;
+  SUBJECTS.filter(s => !s.comingSoon).forEach(s => {
+    const p = subjectProgress(s.id);
+    done += p.done; total += p.total;
+  });
+  return { done, total };
+}
+
+function updateGlobalBar() {
+  const { done, total } = globalProgress();
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('global-bar').style.width = pct + '%';
+  document.getElementById('global-text').textContent = `${done} / ${total} topics`;
+}
+
+// ===================== HOME =====================
+function renderHome() {
+  const grid = document.getElementById('subjects-grid');
+  grid.innerHTML = '';
+  SUBJECTS.forEach(sub => {
+    const { done, total } = subjectProgress(sub.id);
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const card = document.createElement('div');
+    card.className = 'subject-card' + (sub.comingSoon ? ' coming-soon' : '');
+    card.style.setProperty('--accent', sub.accent);
+    card.style.setProperty('--accent-dim', sub.accentDim);
+    card.innerHTML = `
+      <div class="card-icon">${sub.icon}</div>
+      <div class="card-title">${sub.name}</div>
+      <div class="card-subtitle">${sub.subtitle}</div>
+      ${sub.comingSoon ? `<span class="soon-badge">Coming soon</span>` : `
+        <div class="card-progress-wrap">
+          <div class="card-bar"><div class="card-bar-fill" style="width:${pct}%"></div></div>
+          <div class="card-pct">${pct}%</div>
+        </div>
+      `}
+    `;
+    if (!sub.comingSoon) card.onclick = () => openSubject(sub.id);
+    grid.appendChild(card);
+  });
+  updateGlobalBar();
+}
+
+// ===================== SUBJECT PAGE =====================
+let currentSubjectId = null;
+
+function openSubject(id) {
+  currentSubjectId = id;
+  const sub = SUBJECTS.find(s => s.id === id);
+  document.getElementById('home').style.display = 'none';
+  const sp = document.getElementById('subject-page');
+  sp.style.display = 'block';
+  sp.style.setProperty('--s-accent', sub.accent);
+
+  document.getElementById('sp-title').textContent = sub.name;
+  renderSubjectPage(sub);
+  updateSubjectProgress(sub);
+}
+
+function goHome() {
+  document.getElementById('subject-page').style.display = 'none';
+  document.getElementById('home').style.display = 'block';
+  currentSubjectId = null;
+  renderHome();
+}
+
+function renderSubjectPage(sub) {
+  const list = document.getElementById('chapters-list');
+  list.innerHTML = '';
+  sub.chapters.forEach((ch, ci) => {
+    const block = document.createElement('div');
+    block.className = 'chapter-block';
+    block.id = `ch-${ci}`;
+
+    const doneCh = ch.topics.filter((_, ti) => isTopicDone(sub.id, getTopicKey(ci, ti))).length;
+
+    block.innerHTML = `
+      <div class="chapter-header" onclick="toggleChapter(${ci})">
+        <div class="chapter-name">${ch.name}</div>
+        <div class="chapter-count">${doneCh}/${ch.topics.length}</div>
+        <div class="chapter-chevron">▾</div>
+      </div>
+      <div class="topics-list" id="tl-${ci}">
+        ${ch.topics.map((t, ti) => {
+          const done = isTopicDone(sub.id, getTopicKey(ci, ti));
+          return `
+            <div class="topic-item${done ? ' done' : ''}" id="ti-${ci}-${ti}" onclick="toggleTopic('${sub.id}', ${ci}, ${ti})">
+              <div class="topic-check">
+                <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+                  <path d="M1 4L4 7L10 1" stroke="#0d0d0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="topic-label">${t.label}</div>
+              ${t.code ? `<div class="topic-code">${t.code}</div>` : ''}
+              ${t.page ? `<div class="topic-page">p.${t.page}</div>` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    list.appendChild(block);
+  });
+}
+
+function toggleChapter(ci) {
+  document.getElementById(`ch-${ci}`).classList.toggle('collapsed');
+}
+
+function toggleTopic(subjectId, ci, ti) {
+  const key = getTopicKey(ci, ti);
+  const newVal = !isTopicDone(subjectId, key);
+  setTopicDone(subjectId, key, newVal);
+
+  const item = document.getElementById(`ti-${ci}-${ti}`);
+  item.classList.toggle('done', newVal);
+
+  // update chapter count
+  const sub = SUBJECTS.find(s => s.id === subjectId);
+  const ch = sub.chapters[ci];
+  const doneCh = ch.topics.filter((_, i) => isTopicDone(subjectId, getTopicKey(ci, i))).length;
+  document.querySelector(`#ch-${ci} .chapter-count`).textContent = `${doneCh}/${ch.topics.length}`;
+
+  updateSubjectProgress(sub);
+  updateGlobalBar();
+}
+
+function updateSubjectProgress(sub) {
+  const { done, total } = subjectProgress(sub.id);
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('sp-count').textContent = `${done} of ${total} topics complete`;
+  document.getElementById('sp-bar').style.width = pct + '%';
+  document.getElementById('sp-pct').textContent = pct + '%';
+}
+
+function clearSubject() {
+  if (!currentSubjectId) return;
+  if (!confirm('Clear all ticks for this subject?')) return;
+  cookieData[currentSubjectId] = {};
+  saveCookieData(cookieData);
+  const sub = SUBJECTS.find(s => s.id === currentSubjectId);
+  renderSubjectPage(sub);
+  updateSubjectProgress(sub);
+  updateGlobalBar();
+}
+
+// ===================== INIT =====================
+renderHome();
+</script>
+</body>
+</html>
